@@ -1,5 +1,35 @@
 [
   {
+    "name": "Billiard 1",
+    "svg_id": "rect266",
+    "room_type": "Billiard",
+    "capacity": 5,
+    "description": "Billiard room for team recreation and informal meetings",
+    "amenities": [
+      "Billiard Table"
+    ],
+    "coordinates": {
+      "x": 824.44342,
+      "y": 696.38123
+    },
+    "is_available": true
+  },
+  {
+    "name": "Billiard 2",
+    "svg_id": "rect267",
+    "room_type": "Billiard",
+    "capacity": 5,
+    "description": "Billiard room for team recreation and informal meetings",
+    "amenities": [
+      "Billiard Table"
+    ],
+    "coordinates": {
+      "x": 825.82788,
+      "y": 829.289
+    },
+    "is_available": true
+  },
+  {
     "name": "DeskSeat 1",
     "svg_id": "rect1",
     "room_type": "DeskSeat",
@@ -11,7 +41,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 864.14,
       "y": 411.34
@@ -30,7 +59,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 865.22,
       "y": 454.42
@@ -49,7 +77,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 865.22,
       "y": 501.8
@@ -68,7 +95,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 955.13,
       "y": 410.35
@@ -87,7 +113,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 955.52,
       "y": 454.77
@@ -106,7 +131,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 954.75,
       "y": 501.14
@@ -125,7 +149,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 986.7,
       "y": 409.96
@@ -144,7 +167,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 987.09,
       "y": 455.16
@@ -163,7 +185,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 986.7,
       "y": 501.53
@@ -182,7 +203,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1076.33,
       "y": 410.74
@@ -201,7 +221,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1075.94,
       "y": 455.55
@@ -220,7 +239,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1075.94,
       "y": 501.14
@@ -239,7 +257,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1115.3,
       "y": 409.57
@@ -258,7 +275,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1115.69,
       "y": 456.33
@@ -277,7 +293,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1114.91,
       "y": 501.14
@@ -296,7 +311,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1204.54,
       "y": 411.13
@@ -315,7 +329,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1204.54,
       "y": 455.55
@@ -334,7 +347,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1204.15,
       "y": 500.36
@@ -353,7 +365,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1235.71,
       "y": 409.96
@@ -372,7 +383,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1236.49,
       "y": 455.55
@@ -391,7 +401,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1236.1,
       "y": 500.75
@@ -410,7 +419,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1325.34,
       "y": 409.96
@@ -429,7 +437,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1325.73,
       "y": 455.55
@@ -448,7 +455,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1325.34,
       "y": 500.75
@@ -467,7 +473,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1364.31,
       "y": 410.35
@@ -486,7 +491,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1365.09,
       "y": 455.94
@@ -505,7 +509,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1365.09,
       "y": 501.14
@@ -524,7 +527,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1453.94,
       "y": 409.57
@@ -543,7 +545,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1453.88,
       "y": 455.92
@@ -562,7 +563,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1454.2,
       "y": 501.83
@@ -581,7 +581,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1485.22,
       "y": 409.7
@@ -600,7 +599,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1485.54,
       "y": 455.92
@@ -619,7 +617,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1485.22,
       "y": 501.51
@@ -638,7 +635,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1574.51,
       "y": 410.33
@@ -657,7 +653,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1574.19,
       "y": 456.55
@@ -676,7 +671,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 1574.83,
       "y": 501.2
@@ -695,7 +689,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3088.54,
       "y": 410.7
@@ -714,7 +707,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3089.33,
       "y": 456.74
@@ -733,7 +725,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3121.17,
       "y": 411.23
@@ -752,7 +743,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3120.64,
       "y": 457.01
@@ -771,7 +761,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3090.91,
       "y": 501.73
@@ -790,7 +779,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3121.43,
       "y": 502.0
@@ -809,7 +797,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 866.34,
       "y": 1080.3
@@ -828,7 +815,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 867.41,
       "y": 1123.37
@@ -847,7 +833,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 867.41,
       "y": 1170.75
@@ -866,7 +851,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 957.33,
       "y": 1079.3
@@ -885,7 +869,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 957.72,
       "y": 1123.72
@@ -904,7 +887,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 956.94,
       "y": 1170.1
@@ -923,7 +905,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2841.05,
       "y": 1079.65
@@ -942,7 +923,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2843.16,
       "y": 1124.91
@@ -961,7 +941,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2842.37,
       "y": 1169.9
@@ -980,7 +959,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2873.68,
       "y": 1079.92
@@ -999,7 +977,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2962.34,
       "y": 1125.96
@@ -1018,7 +995,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 2962.34,
       "y": 1170.16
@@ -1037,7 +1013,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3002.07,
       "y": 1079.65
@@ -1056,7 +1031,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3001.81,
       "y": 1126.49
@@ -1075,7 +1049,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3090.73,
       "y": 1079.65
@@ -1094,7 +1067,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3091.52,
       "y": 1125.7
@@ -1113,7 +1085,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3123.36,
       "y": 1080.18
@@ -1132,7 +1103,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3122.83,
       "y": 1125.96
@@ -1151,7 +1121,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3093.1,
       "y": 1170.69
@@ -1170,7 +1139,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3123.62,
       "y": 1170.95
@@ -1189,7 +1157,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3211.76,
       "y": 1079.39
@@ -1208,7 +1175,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3212.02,
       "y": 1124.91
@@ -1227,7 +1193,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 10.0,
     "coordinates": {
       "x": 3212.02,
       "y": 1170.16
@@ -1246,7 +1211,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3091.03,
       "y": 674.21
@@ -1265,7 +1229,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3119.35,
       "y": 675.36
@@ -1284,7 +1247,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3141.95,
       "y": 700.82
@@ -1303,7 +1265,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3142.81,
       "y": 727.42
@@ -1322,7 +1283,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3141.66,
       "y": 754.31
@@ -1341,7 +1301,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3141.38,
       "y": 779.48
@@ -1360,7 +1319,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3143.09,
       "y": 806.65
@@ -1379,7 +1337,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3227.76,
       "y": 699.1
@@ -1398,7 +1355,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3253.79,
       "y": 674.5
@@ -1417,7 +1373,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3282.4,
       "y": 674.21
@@ -1436,7 +1391,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3307.0,
       "y": 674.79
@@ -1455,7 +1409,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3332.17,
       "y": 702.82
@@ -1474,7 +1427,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3330.45,
       "y": 726.85
@@ -1493,7 +1445,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3331.31,
       "y": 754.88
@@ -1512,7 +1463,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3228.05,
       "y": 752.02
@@ -1531,7 +1481,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 3228.91,
       "y": 727.13
@@ -1542,7 +1491,7 @@
     "name": "BeerPoint 1",
     "svg_id": "path266",
     "room_type": "BeerPoint",
-    "capacity": 8,
+    "capacity": 50,
     "description": "Social area for informal gatherings and team bonding",
     "amenities": [
       "Bar Area",
@@ -1550,7 +1499,6 @@
       "Refrigerator",
       "WiFi"
     ],
-    "price": 40.0,
     "coordinates": {
       "x": 25.0,
       "y": 25.0
@@ -1569,7 +1517,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 661.28,
       "y": 374.04
@@ -1588,7 +1535,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 661.28,
       "y": 485.78
@@ -1607,7 +1553,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 660.33,
       "y": 1098.76
@@ -1626,7 +1571,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 661.28,
       "y": 1209.87
@@ -1645,7 +1589,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 3308.55,
       "y": 1028.19
@@ -1664,7 +1607,6 @@
       "Storage",
       "WiFi"
     ],
-    "price": 30.0,
     "coordinates": {
       "x": 3310.48,
       "y": 1183.1
@@ -1683,7 +1625,6 @@
       "Storage",
       "WiFi"
     ],
-    "price": 30.0,
     "coordinates": {
       "x": 3312.42,
       "y": 427.93
@@ -1702,7 +1643,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 3311.77,
       "y": 582.19
@@ -1721,7 +1661,6 @@
       "WiFi",
       "Projector"
     ],
-    "price": 45.0,
     "coordinates": {
       "x": 2947.73,
       "y": 903.42
@@ -1740,7 +1679,6 @@
       "WiFi",
       "Natural Light"
     ],
-    "price": 35.0,
     "coordinates": {
       "x": 2949.23,
       "y": 742.36
@@ -1758,7 +1696,6 @@
       "Security",
       "Power Backup"
     ],
-    "price": 100.0,
     "coordinates": {
       "x": 2765.7,
       "y": 718.39
@@ -1775,7 +1712,6 @@
       "Storage Space",
       "Shelving"
     ],
-    "price": 15.0,
     "coordinates": {
       "x": 2764.95,
       "y": 859.22
@@ -1792,7 +1728,6 @@
       "Storage Space",
       "Shelving"
     ],
-    "price": 15.0,
     "coordinates": {
       "x": 2118.47,
       "y": 922.15
@@ -1811,7 +1746,6 @@
       "WiFi",
       "Seating"
     ],
-    "price": 50.0,
     "coordinates": {
       "x": 2204.62,
       "y": 920.65
@@ -1830,7 +1764,6 @@
       "WiFi",
       "Seating"
     ],
-    "price": 50.0,
     "coordinates": {
       "x": 1555.58,
       "y": 660.33
@@ -1848,7 +1781,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 20.0,
     "coordinates": {
       "x": 2765.27,
       "y": 931.31
@@ -1866,7 +1798,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 801.38,
       "y": 464.36
@@ -1885,7 +1816,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 847.33,
       "y": 341.34
@@ -1904,7 +1834,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 885.56,
       "y": 340.72
@@ -1922,7 +1851,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 1915.73,
       "y": 482.86
@@ -1940,7 +1868,6 @@
       "WiFi",
       "Power Outlet"
     ],
-    "price": 15.0,
     "coordinates": {
       "x": 1914.81,
       "y": 409.17
@@ -1958,7 +1885,6 @@
       "WiFi",
       "Power Outlet"
     ],
-    "price": 15.0,
     "coordinates": {
       "x": 1915.54,
       "y": 1124.94
@@ -1976,7 +1902,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 802.15,
       "y": 1120.45
@@ -1994,7 +1919,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 1913.61,
       "y": 1240.45
@@ -2012,7 +1936,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 2521.29,
       "y": 1236.99
@@ -2030,7 +1953,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 3206.29,
       "y": 344.18
@@ -2048,7 +1970,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 2447.63,
       "y": 348.06
@@ -2067,7 +1988,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1151.57,
       "y": 340.3
@@ -2086,7 +2006,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1193.41,
       "y": 340.3
@@ -2105,7 +2024,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1438.82,
       "y": 339.43
@@ -2123,7 +2041,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 1603.58,
       "y": 346.77
@@ -2142,7 +2059,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1744.18,
       "y": 338.57
@@ -2161,7 +2077,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2023.23,
       "y": 338.57
@@ -2180,7 +2095,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2578.32,
       "y": 339.0
@@ -2199,7 +2113,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2618.86,
       "y": 340.73
@@ -2218,7 +2131,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2769.82,
       "y": 340.73
@@ -2237,7 +2149,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2809.5,
       "y": 340.73
@@ -2256,7 +2167,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2926.26,
       "y": 1244.68
@@ -2275,7 +2185,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2885.54,
       "y": 1246.33
@@ -2294,7 +2203,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2663.24,
       "y": 1246.88
@@ -2313,7 +2221,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2338.59,
       "y": 1245.23
@@ -2332,7 +2239,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2402.97,
       "y": 1246.33
@@ -2351,7 +2257,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2025.49,
       "y": 1245.23
@@ -2370,7 +2275,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1744.86,
       "y": 1244.68
@@ -2389,7 +2293,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1436.72,
       "y": 1245.23
@@ -2408,7 +2311,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1192.95,
       "y": 1245.23
@@ -2427,7 +2329,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 1149.48,
       "y": 1245.23
@@ -2446,7 +2347,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 886.46,
       "y": 1244.68
@@ -2465,7 +2365,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 844.64,
       "y": 1244.68
@@ -2483,7 +2382,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 25.0,
     "coordinates": {
       "x": 1275.92,
       "y": 1236.6
@@ -2502,7 +2400,6 @@
       "Power Outlet",
       "WiFi"
     ],
-    "price": 12.0,
     "coordinates": {
       "x": 2334.79,
       "y": 338.39
@@ -2520,7 +2417,6 @@
       "Seating",
       "WiFi"
     ],
-    "price": 20.0,
     "coordinates": {
       "x": 1649.92,
       "y": 660.81

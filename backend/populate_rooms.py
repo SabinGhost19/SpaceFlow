@@ -41,12 +41,12 @@ async def populate_rooms():
                     skip_count += 1
                     continue
                 
-                # Create room schema
+                # Create room schema (with default price if not in JSON)
                 room_create = RoomCreate(
                     name=room_data['name'],
                     description=room_data['description'],
                     capacity=room_data['capacity'],
-                    price=room_data['price'],
+                    price=room_data.get('price', 0.0),  # Default to 0.0 if price not in JSON
                     amenities=room_data['amenities'],
                     svg_id=room_data['svg_id'],
                     coordinates=room_data['coordinates'],

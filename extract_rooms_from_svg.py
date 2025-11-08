@@ -7,97 +7,82 @@ import json
 import re
 from collections import defaultdict
 
-# Room type configurations
+# Room type configurations (without price)
 ROOM_CONFIGS = {
     "MeetingRoom": {
         "capacity": 4,
         "description": "Meeting room perfect for small team discussions and collaborative work",
-        "amenities": ["Whiteboard", "Video Conference", "WiFi", "Projector"],
-        "price": 45.0
+        "amenities": ["Whiteboard", "Video Conference", "WiFi", "Projector"]
     },
     "PhoneBoothArea": {
         "capacity": 1,
         "description": "Private phone booth for confidential calls and focused work",
-        "amenities": ["Soundproof", "WiFi", "Power Outlet"],
-        "price": 15.0
+        "amenities": ["Soundproof", "WiFi", "Power Outlet"]
     },
     "DeskSeat": {
         "capacity": 1,
         "description": "Individual desk seat for focused work",
-        "amenities": ["Desk", "Ergonomic Chair", "Power Outlet", "WiFi"],
-        "price": 10.0
+        "amenities": ["Desk", "Ergonomic Chair", "Power Outlet", "WiFi"]
     },
     "Biliard": {
         "capacity": 5,
         "description": "Billiard room for team recreation and informal meetings",
-        "amenities": ["Billiard Table", "Seating Area", "Entertainment"],
-        "price": 35.0
+        "amenities": ["Billiard Table", "Seating Area", "Entertainment"]
     },
     "BeerPoint": {
-        "capacity": 8,
+        "capacity": 50,
         "description": "Social area for informal gatherings and team bonding",
-        "amenities": ["Bar Area", "Seating", "Refrigerator", "WiFi"],
-        "price": 40.0
+        "amenities": ["Bar Area", "Seating", "Refrigerator", "WiFi"]
     },
     "Bubble": {
         "capacity": 2,
         "description": "Small private bubble space for one-on-one discussions",
-        "amenities": ["Privacy", "Seating", "WiFi"],
-        "price": 25.0
+        "amenities": ["Privacy", "Seating", "WiFi"]
     },
     "SoloDesk": {
         "capacity": 1,
         "description": "Solo desk for individual focused work",
-        "amenities": ["Desk", "Chair", "Power Outlet", "WiFi"],
-        "price": 12.0
+        "amenities": ["Desk", "Chair", "Power Outlet", "WiFi"]
     },
     "ElectricTable": {
         "capacity": 6,
         "description": "Adjustable electric table for flexible working arrangements",
-        "amenities": ["Electric Adjustable Desk", "Power Outlets", "WiFi", "Seating"],
-        "price": 50.0
+        "amenities": ["Electric Adjustable Desk", "Power Outlets", "WiFi", "Seating"]
     },
     "CoffeePoint": {
         "capacity": 4,
         "description": "Coffee area for casual meetings and breaks",
-        "amenities": ["Coffee Machine", "Seating", "WiFi"],
-        "price": 20.0
+        "amenities": ["Coffee Machine", "Seating", "WiFi"]
     },
     "Deposit": {
         "capacity": 2,
         "description": "Storage and deposit area",
-        "amenities": ["Storage Space", "Shelving"],
-        "price": 15.0
+        "amenities": ["Storage Space", "Shelving"]
     },
     "ItDeposit": {
         "capacity": 2,
         "description": "IT equipment storage and maintenance area",
-        "amenities": ["Storage Space", "Workbench", "Power Outlets"],
-        "price": 20.0
+        "amenities": ["Storage Space", "Workbench", "Power Outlets"]
     },
     "ServerRoom": {
         "capacity": 2,
         "description": "Server room for IT infrastructure (restricted access)",
-        "amenities": ["Climate Control", "Security", "Power Backup"],
-        "price": 100.0
+        "amenities": ["Climate Control", "Security", "Power Backup"]
     },
     "DiscussionZone": {
         "capacity": 6,
         "description": "Open discussion zone for brainstorming and team collaboration",
-        "amenities": ["Whiteboard", "Comfortable Seating", "WiFi", "Natural Light"],
-        "price": 35.0
+        "amenities": ["Whiteboard", "Comfortable Seating", "WiFi", "Natural Light"]
     },
     "TrainingSeat": {
         "capacity": 1,
         "description": "Training seat for learning and development activities",
-        "amenities": ["Desk", "Chair", "Power Outlet", "WiFi"],
-        "price": 12.0
+        "amenities": ["Desk", "Chair", "Power Outlet", "WiFi"]
     },
     "ManagerDesk": {
         "capacity": 1,
         "description": "Manager desk for leadership and administrative work",
-        "amenities": ["Executive Desk", "Ergonomic Chair", "Storage", "WiFi"],
-        "price": 30.0
+        "amenities": ["Executive Desk", "Ergonomic Chair", "Storage", "WiFi"]
     }
 }
 
@@ -155,7 +140,7 @@ def parse_svg_rooms(svg_file):
                     
                     config = ROOM_CONFIGS[room_type]
                     
-                    # Create room data
+                    # Create room data (without price)
                     room_data = {
                         'name': f"{room_type} {instance_num}",
                         'svg_id': elem_id,
@@ -163,7 +148,6 @@ def parse_svg_rooms(svg_file):
                         'capacity': config['capacity'],
                         'description': config['description'],
                         'amenities': config['amenities'],
-                        'price': config['price'],
                         'coordinates': {
                             'x': round(center_x, 2),
                             'y': round(center_y, 2)
@@ -193,8 +177,7 @@ def main():
         print(f"\n{room_type}: {len(room_list)} rooms")
         for room in room_list:
             print(f"  - {room['name']} (ID: {room['svg_id']}, "
-                  f"Capacity: {room['capacity']}, "
-                  f"Price: ${room['price']}/hr)")
+                  f"Capacity: {room['capacity']})")
     
     # Save to JSON file
     output_file = 'backend/rooms_data.json'
