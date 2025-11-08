@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Navbar } from "@/components/Navbar";
 import { Calendar as CalendarIcon, Clock, CheckCircle2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -177,9 +176,6 @@ const View2DMap = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-amber-900 flex flex-col">
-            {/* Keep original navbar */}
-            <Navbar />
-
             <div className="container mx-auto px-4 py-6 flex-1">
                 {/* Booking Controls */}
                 <Card className="bg-slate-800/60 border-white/10 mb-6">
