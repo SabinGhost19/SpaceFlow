@@ -1,218 +1,237 @@
-Prompts:
 
+Trebuie să creezi o aplicație full-stack profesională cu următoarele componente:
 
----
+## 1. BACKEND - FastAPI
 
-**PROMPT PENTRU CLAUDE SONNET 4.5:**
+Creează un backend FastAPI complet și profesional cu următoarea structură:
 
+### Structura proiectului:
 ```
-Trebuie să integrezi funcționalitățile dintr-un fișier HTML existent (2d_front.html) și un fișier SVG (floor-plan.svg) într-o aplicație React.js profesională existentă, folosind Tailwind CSS și shadcn/ui.
-
-CONTEXT:
-- Am o aplicație React.js funcțională cu un sistem de tabs
-- Am un fișier 2d_front.html care conține funcționalități pentru vizualizarea unei hărți 2D
-- Am un fișier floor-plan.svg care este folosit în acel HTML
-- Vreau să adaug un nou tab numit "View 2D Map" care să conțină toate funcționalitățile din 2d_front.html
-
-CERINȚE TEHNICE:
-1. **Framework și stilizare:**
-   - React.js (cu hooks: useState, useEffect, useRef, etc.)
-   - Tailwind CSS pentru styling
-   - shadcn/ui pentru componente UI (buttons, tabs, cards, dialogs, etc.)
-   - TypeScript (dacă este posibil)
-
-2. **Structură:**
-   - Creează o componentă nouă: `View2DMap.tsx` (sau .jsx)
-   - Integrează această componentă în sistemul de tabs existent
-   - Asigură-te că tab-ul se numește exact "View 2D Map"
-
-3. **Funcționalități de integrat din 2d_front.html:**
-   - Parsează tot codul JavaScript și convertește-l în React hooks și event handlers
-   - Păstrează TOATE funcționalitățile interactive (zoom, pan, click events, etc.)
-   - Integrează SVG-ul floor-plan.svg direct în componenta React
-   - Convertește orice manipulare DOM în echivalentul React (refs, state management)
-
-4. **Design profesional:**
-   - UI modern, clean și responsive
-   - Folosește componente shadcn/ui pentru controale (buttons, sliders, tooltips)
-   - Paletă de culori consistentă cu aplicația existentă
-   - Animații fluide și tranziții smooth
-   - Loading states și error handling
-   - Mobile-friendly (responsive design)
-
-5. **Calitatea codului:**
-   - Cod clean, bine organizat și comentat
-   - Separare clară a logic-ului de prezentare
-   - Custom hooks pentru logica refolosibilă
-   - PropTypes sau TypeScript pentru type safety
-   - Performanță optimizată (useMemo, useCallback unde e necesar)
-
-FIȘIERELE DISPONIBILE:
-Voi atașa cele două fișiere:
-1. 2d_front.html - conține tot HTML-ul, CSS-ul și JavaScript-ul
-2. floor-plan.svg - fișierul SVG folosit pentru vizualizare
-
-LIVRABILE NECESARE:
-1. **View2DMap.tsx/jsx** - componenta principală completă
-2. **Integrare în App.tsx** - codul pentru adăugarea noului tab
-3. **Fișiere suplimentare** (dacă sunt necesare):
-   - Custom hooks (ex: useFloorPlan.ts, useZoom.ts)
-   - Componente auxiliare (ex: MapControls.tsx, MapLegend.tsx)
-   - Utils/helpers (ex: svgUtils.ts)
-4. **Instrucțiuni de instalare** - comenzi npm pentru orice dependințe noi
-5. **Documentație** - explicații pentru funcționalitățile principale
-
-AȘTEPTĂRI:
-- Codul să fie production-ready
-- Toate funcționalitățile din 2d_front.html să fie prezente și funcționale
-- Design consistent cu best practices React și Tailwind
-- Cod modular și ușor de întreținut
-- Comentarii clare pentru logica complexă
-
-COMENZI:
-1. Analizează în detaliu fișierul 2d_front.html
-2. Identifică toate funcționalitățile JavaScript existente
-3. Creează structura componentei React
-4. Convertește fiecare funcționalitate în React
-5. Integrează SVG-ul în mod optim
-6. Adaugă styling profesional cu Tailwind + shadcn/ui
-7. Testează că totul funcționează corect
-8. Oferă codul complet și instrucțiuni clare
-
-Începe prin a-mi cere să îți arăt cele două fișiere (2d_front.html și floor-plan.svg), apoi creează soluția completă.
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── config.py
+│   ├── database.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── user.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── user.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── deps.py
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       ├── auth.py
+│   │       └── users.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── security.py
+│   │   └── config.py
+│   └── crud/
+│       ├── __init__.py
+│       └── user.py
+├── alembic/
+├── requirements.txt
+├── Dockerfile
+└── .env.example
 ```
 
----
+### Cerințe pentru backend:
 
-**INSTRUCȚIUNI DE UTILIZARE:**
+1. **Configurare PostgreSQL:**
+   - Conexiune la container PostgreSQL Docker
+   - Utilizare SQLAlchemy 2.0+ cu async
+   - Auto-creare bază de date dacă nu există
+   - Auto-creare tabele dacă nu există (folosind Base.metadata.create_all())
+   - Sistem flexibil care detectează și creează automat tabele noi când sunt adăugate modele noi
 
-1. Copiază prompt-ul de mai sus
-2. Deschide o conversație nouă cu Claude Sonnet 4.5
-3. Lipește prompt-ul
-4. Când Claude îți cere, atașează fișierele `2d_front.html` și `floor-plan.svg`
-5. Claude va analiza fișierele și va crea întreaga soluție
+2. **Autentificare JWT robustă:**
+   - Access token (15-30 minute expirare)
+   - Refresh token (7 zile expirare)
+   - Hashare parole cu bcrypt
+   - Middleware pentru verificare token
+   - Endpoint-uri: `/auth/signup`, `/auth/login`, `/auth/refresh`, `/auth/logout`
 
-**OPȚIONAL - Adaugă la final dacă vrei specificații suplimentare:**
+3. **CRUD Utilizatori:**
+   - Creare user (signup)
+   - Citire user (get current user, get user by id)
+   - Update user (update profile)
+   - Ștergere user (delete account)
+   - Toate operațiunile protejate cu JWT (exceptând signup/login)
+
+4. **Model User să conțină:**
+   - id (UUID/Integer primary key)
+   - email (unique, indexed)
+   - username (unique, indexed)
+   - hashed_password
+   - full_name (optional)
+   - is_active (boolean)
+   - is_superuser (boolean)
+   - created_at (timestamp)
+   - updated_at (timestamp)
+
+5. **Validări cu Pydantic v2:**
+   - Schema pentru UserCreate (signup)
+   - Schema pentru UserLogin
+   - Schema pentru UserResponse
+   - Schema pentru UserUpdate
+   - Schema pentru Token
+
+6. **Security best practices:**
+   - CORS configurat corect pentru frontend
+   - Environment variables pentru secrets
+   - SQL injection prevention (prin SQLAlchemy ORM)
+   - Rate limiting (opțional dar recomandat)
+   - Password strength validation
+
+## 2. DOCKER SETUP
+
+Creează:
+
+### docker-compose.yml:
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: app_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: app_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
 ```
-CERINȚE ADIȚIONALE:
-- [Specifică orice funcționalitate extra dorită]
-- [Menționează stilul exact de UI preferat]
-- [Alte constrainte sau preferințe]
+
+### Dockerfile pentru backend:
+- Python 3.11+ slim
+- Multi-stage build pentru optimizare
+- Non-root user pentru securitate
+
+## 3. FRONTEND - Modificări necesare
+
+**Analizează codul frontend existent** și modifică-l pentru a integra cu backend-ul:
+
+### Ce trebuie implementat în frontend:
+
+1. **Service/API Layer:**
+   - Axios sau Fetch pentru requests
+   - Interceptori pentru JWT (automat atașat la headers)
+   - Base URL configurabil (environment variable)
+   - Error handling centralizat
+
+2. **Auth Flow:**
+   - Signup form conectat la `/auth/signup`
+   - Login form conectat la `/auth/login`
+   - Token storage (localStorage sau secure cookies)
+   - Auto-refresh token înainte de expirare
+   - Logout cu invalidare token
+   - Protected routes cu verificare token
+
+3. **User Management:**
+   - Fetch current user după login
+   - Display user info în UI
+   - Update profile form
+   - Delete account cu confirmare
+
+4. **State Management:**
+   - Context API / Redux / Zustand pentru auth state
+   - Loading states
+   - Error states
+   - Success messages
+
+### Structura API calls din frontend:
+```javascript
+// Exemplu structură
+const api = {
+  auth: {
+    signup: (data) => POST('/auth/signup', data),
+    login: (data) => POST('/auth/login', data),
+    refresh: () => POST('/auth/refresh'),
+    logout: () => POST('/auth/logout')
+  },
+  users: {
+    getCurrent: () => GET('/users/me'),
+    update: (data) => PUT('/users/me', data),
+    delete: () => DELETE('/users/me')
+  }
+}
 ```
 
+## 4. CERINȚE GENERALE
 
+1. **Cod profesionist:**
+   - Type hints în Python
+   - Docstrings pentru funcții
+   - Error handling comprehensiv
+   - Logging adecvat
+   - Comentarii pentru logica complexă
 
+2. **Testing ready:**
+   - Structură care permite unit tests
+   - Dependency injection pentru testabilitate
 
+3. **Environment Variables:**
+   - `.env.example` cu toate variabilele necesare
+   - Documentație pentru setup
 
+4. **README complet:**
+   - Instrucțiuni de instalare
+   - Cum să rulezi cu Docker
+   - API documentation
+   - Environment setup
 
+5. **Security:**
+   - Secrets în environment variables
+   - HTTPS ready
+   - SQL injection proof
+   - XSS protection
 
+## OUTPUT AȘTEPTAT:
 
+Furnizează:
+1. ✅ Codul complet pentru backend (toate fișierele)
+2. ✅ Docker setup complet (docker-compose.yml, Dockerfiles)
+3. ✅ Modificările necesare pentru frontend (cod specific pentru integrare)
+4. ✅ Fișier `.env.example`
+5. ✅ README cu instrucțiuni clare de setup și rulare
+6. ✅ Exemple de requests (curl sau Postman collection)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```
-Create a professional, modern room booking frontend application using React.js, Tailwind CSS, and shadcn/ui with the following specifications:
-
-## Design Requirements
-- **Color Palette (strictly prioritize these colors):**
-  - Primary: #96A78D (sage green)
-  - Secondary: #B6CEB4 (light sage)
-  - Accent: #D9E9CF (pale mint)
-  - Background: #F0F0F0 (light gray)
-- **Style:** Minimalist, modern, professional with subtle, tasteful animations
-- **UX:** Easy navigation, intuitive interface, responsive design
-
-## Core Features (Mock data for initial display)
-
-### 1. Authentication Pages
-- Login page with email/password fields
-- Sign up/registration page with form validation
-- Password recovery option
-- Smooth page transitions
-
-### 2. Main Dashboard
-- Overview of available rooms
-- Quick booking panel
-- Upcoming reservations summary
-- Statistics cards (total bookings, available rooms, etc.)
-
-### 3. Room Browsing & Booking
-- Grid/list view of available rooms with:
-  - Room images (use placeholder images)
-  - Room name, capacity, amenities
-  - Price per hour/day
-  - Availability status
-- Filtering options (capacity, amenities, price range)
-- Search functionality
-- **"View 2D Map" button (non-functional, just UI button)**
-
-### 4. Custom Calendar & Schedule
-- Interactive calendar component for selecting booking dates/times
-- Visual representation of booked vs available time slots
-- Multi-day booking capability
-- Personal schedule view showing user's bookings
-- Time slot selection with visual feedback
-
-### 5. Booking Management
-- Create new booking flow with:
-  - Room selection
-  - Date/time picker
-  - Duration selector
-  - Additional services/amenities
-  - Booking summary and confirmation
-- View/edit/cancel existing bookings
-- Booking history
-
-### 6. User Profile
-- Personal information display
-- Booking preferences
-- Notification settings
-
-## Technical Implementation
-- Use React hooks (useState, useEffect, useContext)
-- Implement React Router for navigation
-- Create reusable components
-- Use shadcn/ui components (Button, Card, Dialog, Calendar, Select, Input, etc.)
-- Implement smooth animations with Framer Motion or CSS transitions
-- Mock data stored in JSON format or state management
-- Responsive design (mobile, tablet, desktop)
-
-## Animation & Interaction Details
-- Smooth page transitions
-- Hover effects on interactive elements
-- Loading states with skeleton screens
-- Success/error notifications with slide-in animations
-- Calendar date selection with visual feedback
-- Card hover effects with subtle scaling/shadow
-- Smooth scrolling
-
-## Layout Structure
-- Navigation bar (logo, menu items, user profile dropdown)
-- Sidebar for quick actions (optional, collapsible)
-- Main content area
-- Footer with links and information
-
-## Additional Polish
-- Dark mode toggle (optional but recommended)
-- Accessibility features (ARIA labels, keyboard navigation)
-- Loading states and error handling
-- Empty states with helpful messages
-- Confirmation modals for important actions
-
-Generate the complete, production-ready code with all components, proper file structure, and mock data. Make it look like a professional SaaS application that could be deployed immediately for demonstration purposes.
-```
+**IMPORTANT:** 
+- Codul trebuie să fie production-ready
+- Fără placeholder-uri sau TODO-uri
+- Toate dependențele specificate în requirements.txt
+- Sistema să pornească cu `docker-compose up` și să funcționeze imediat
 
