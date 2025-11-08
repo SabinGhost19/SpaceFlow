@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="197.05701"
+   height="585.7865"
+   viewBox="0 0 197.05701 585.7865"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-776.38251,-396.26736)">
+    <rect
+       style="fill:#504416"
+       id="rect1"
+       width="22.613083"
+       height="30.150778"
+       x="852.83624"
+       y="396.26736" />
+    <rect
+       style="fill:#504416"
+       id="rect2"
+       width="22.613083"
+       height="25.843523"
+       x="853.91309"
+       y="441.49353" />
+    <rect
+       style="fill:#504416"
+       id="rect3"
+       width="22.613083"
+       height="27.99715"
+       x="853.91309"
+       y="487.79651" />
+    <rect
+       style="fill:#ff0000"
+       id="BILIARD"
+       width="197.05701"
+       height="379.03833"
+       x="776.38251"
+       y="603.01556" />
+  </g>
+</svg>

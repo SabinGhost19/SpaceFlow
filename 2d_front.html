@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Room Map - 2D Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-320px);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filters {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+        }
+
+        .room-info {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .room-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .room-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .room-card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .room-card .room-details {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .room-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .room-detail .icon {
+            font-size: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-occupied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-maintenance {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Map Viewer */
+        .map-viewer {
+            flex: 1;
+            position: relative;
+            background: #f5f7fa;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+
+        .map-container.grabbing {
+            cursor: grabbing;
+        }
+
+        .map-svg-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+        }
+
+        #mapSVG {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+        }
+
+        /* Room elements styling */
+        .room-polygon {
+            transition: all 0.2s;
+            cursor: pointer;
+            stroke: #333;
+            stroke-width: 2;
+            vector-effect: non-scaling-stroke;
+            /* Keeps stroke width constant when zooming */
+        }
+
+        .room-polygon:hover {
+            filter: brightness(1.3) drop-shadow(0 0 5px currentColor);
+            stroke: #667eea;
+            stroke-width: 3;
+        }
+
+        .room-polygon.selected {
+            stroke: #ff4757;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 10px rgba(255, 71, 87, 0.7));
+        }
+
+        .room-polygon.available {
+            fill: #52c41a !important;
+            fill-opacity: 0.5 !important;
+        }
+
+        .room-polygon.occupied {
+            fill: #f5222d !important;
+            fill-opacity: 0.5 !important;
+        }
+
+        .room-polygon.maintenance {
+            fill: #faad14 !important;
+            fill-opacity: 0.5 !important;
+        }
+
+        /* Non-room SVG elements */
+        #mapSVG path:not(.room-polygon) {
+            pointer-events: none;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .control-group {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin: 5px 0;
+        }
+
+        .control-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .zoom-level {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            padding: 5px;
+            font-weight: 600;
+        }
+
+        /* Toggle Sidebar Button */
+        .toggle-sidebar-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 50;
+            transition: all 0.3s;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Mini Map */
+        .mini-map {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .mini-map-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .mini-map-canvas {
+            width: 100%;
+            height: calc(100% - 20px);
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .mini-map-viewport {
+            position: absolute;
+            border: 2px solid #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            cursor: pointer;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            max-width: 250px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip.show {
+            display: block;
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .tooltip-content {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 15px 25px;
+            display: flex;
+            gap: 30px;
+            z-index: 50;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .stat.available .stat-value {
+            color: #52c41a;
+        }
+
+        .stat.occupied .stat-value {
+            color: #f5222d;
+        }
+
+        .stat.maintenance .stat-value {
+            color: #faad14;
+        }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 15px;
+            }
+
+            .mini-map {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>🏢 Room Map</h1>
+                <p>Interactive Floor Plan Viewer</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search rooms..." />
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Status Filter</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="available">Available</button>
+                        <button class="filter-btn" data-filter="occupied">Occupied</button>
+                        <button class="filter-btn" data-filter="maintenance">Maintenance</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="room-info" id="roomList">
+                <!-- Room cards will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Map Viewer -->
+        <div class="map-viewer">
+            <button class="toggle-sidebar-btn" id="toggleSidebar">☰</button>
+
+            <div class="stats-bar">
+                <div class="stat available">
+                    <div class="stat-value" id="availableCount">0</div>
+                    <div class="stat-label">Available</div>
+                </div>
+                <div class="stat occupied">
+                    <div class="stat-value" id="occupiedCount">0</div>
+                    <div class="stat-label">Occupied</div>
+                </div>
+                <div class="stat maintenance">
+                    <div class="stat-value" id="maintenanceCount">0</div>
+                    <div class="stat-label">Maintenance</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Total Rooms</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <button class="control-btn" id="zoomIn" title="Zoom In">+</button>
+                    <div class="zoom-level" id="zoomLevel">100%</div>
+                    <button class="control-btn" id="zoomOut" title="Zoom Out">−</button>
+                </div>
+                <div class="control-group">
+                    <button class="control-btn" id="resetView" title="Reset View">⟲</button>
+                    <button class="control-btn" id="fitToScreen" title="Fit to Screen">⛶</button>
+                </div>
+            </div>
+
+            <div class="mini-map">
+                <div class="mini-map-title">Overview</div>
+                <div class="mini-map-canvas" id="miniMapCanvas">
+                    <div class="mini-map-viewport" id="miniMapViewport"></div>
+                </div>
+            </div>
+
+            <div class="map-container" id="mapContainer">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Loading map...</div>
+                </div>
+                <div class="map-svg-wrapper" id="mapWrapper">
+                    <!-- SVG will be loaded here -->
+                </div>
+            </div>
+
+            <div class="tooltip" id="tooltip">
+                <div class="tooltip-title" id="tooltipTitle"></div>
+                <div class="tooltip-content" id="tooltipContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class InteractiveMap {
+            constructor() {
+                this.zoom = 1;
+                this.minZoom = 0.1;
+                this.maxZoom = 5;
+                this.translateX = 0;
+                this.translateY = 0;
+                this.isDragging = false;
+                this.startX = 0;
+                this.startY = 0;
+                this.selectedRoom = null;
+                this.rooms = [];
+                this.filteredRooms = [];
+                this.currentFilter = 'all';
+
+                this.initElements();
+                this.loadSVGMap();
+                this.initEventListeners();
+            }
+
+            initElements() {
+                this.mapContainer = document.getElementById('mapContainer');
+                this.mapWrapper = document.getElementById('mapWrapper');
+                this.tooltip = document.getElementById('tooltip');
+                this.tooltipTitle = document.getElementById('tooltipTitle');
+                this.tooltipContent = document.getElementById('tooltipContent');
+                this.sidebar = document.getElementById('sidebar');
+                this.roomList = document.getElementById('roomList');
+                this.searchInput = document.getElementById('searchInput');
+                this.loading = document.getElementById('loading');
+            }
+
+            async loadSVGMap() {
+                try {
+                    // Update loading message
+                    this.loading.querySelector('.loading-text').textContent = 'Loading floor plan...';
+
+                    // Fetch the SVG file
+                    const response = await fetch('floor-plan.svg');
+                    if (!response.ok) {
+                        throw new Error('SVG file not found. Please ensure floor-plan.svg exists in the same directory.');
+                    }
+
+                    this.loading.querySelector('.loading-text').textContent = 'Processing SVG data...';
+                    const svgText = await response.text();
+                    this.mapWrapper.innerHTML = svgText;
+
+                    // Get the SVG element
+                    this.svg = this.mapWrapper.querySelector('svg');
+                    if (!this.svg) {
+                        throw new Error('No SVG element found in the file.');
+                    }
+
+                    this.svg.id = 'mapSVG';
+                    this.svg.style.display = 'block';
+
+                    // Parse rooms from SVG
+                    this.loading.querySelector('.loading-text').textContent = 'Identifying rooms...';
+                    this.parseRoomsFromSVG();
+
+                    // Initialize map view
+                    this.fitToScreen();
+
+                    // Hide loading
+                    this.loading.style.display = 'none';
+
+                    console.log(`Loaded map with ${this.rooms.length} rooms`);
+                } catch (error) {
+                    console.error('Error loading SVG:', error);
+                    this.loading.innerHTML = `
+                        <div style="color: #f5222d;">
+                            <strong>❌ Error Loading Map</strong><br>
+                            <span style="font-size: 12px;">${error.message}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            parseRoomsFromSVG() {
+                // Find all path elements (SVG uses paths for rooms)
+                const allPaths = this.svg.querySelectorAll('path');
+                console.log(`Total paths found: ${allPaths.length}`);
+
+                // Filter only significant paths (potential rooms) - ignore very small elements
+                const significantPaths = Array.from(allPaths).filter((path, index) => {
+                    try {
+                        const bbox = path.getBBox();
+                        // Filter paths that are large enough to be rooms (width > 50 and height > 50)
+                        return bbox.width > 50 && bbox.height > 50 && bbox.width < 500 && bbox.height < 500;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+
+                console.log(`Filtered to ${significantPaths.length} potential rooms`);
+
+                significantPaths.forEach((element, index) => {
+                    // Look for room identifiers in id, class, or data attributes
+                    const id = element.getAttribute('id') ||
+                        element.getAttribute('data-room-id') ||
+                        `room-${index + 1}`;
+
+                    const className = element.getAttribute('class') || '';
+                    const title = element.getAttribute('title') ||
+                        element.getAttribute('data-title') ||
+                        `Room ${index + 1}`;
+
+                    // Assign random status for demo (in real app, this would come from data)
+                    const statuses = ['available', 'occupied', 'maintenance'];
+                    const status = statuses[Math.floor(Math.random() * statuses.length)];
+
+                    // Get element bounds
+                    const bbox = element.getBBox();
+                    const capacity = Math.floor(Math.random() * 50) + 10;
+                    const floor = Math.floor(Math.random() * 5) + 1;
+
+                    const room = {
+                        id: id,
+                        name: title,
+                        element: element,
+                        status: status,
+                        capacity: capacity,
+                        floor: floor,
+                        area: Math.round(bbox.width * bbox.height / 100),
+                        bounds: bbox
+                    };
+
+                    this.rooms.push(room);
+
+                    // Add classes for styling
+                    element.classList.add('room-polygon', status);
+                    element.setAttribute('data-room-id', id);
+
+                    // Add event listeners
+                    element.addEventListener('click', (e) => this.handleRoomClick(room, e));
+                    element.addEventListener('mouseenter', (e) => this.handleRoomHover(room, e));
+                    element.addEventListener('mouseleave', () => this.hideTooltip());
+                });
+
+                this.filteredRooms = [...this.rooms];
+                this.updateRoomList();
+                this.updateStats();
+            }
+
+            handleRoomClick(room, event) {
+                event.stopPropagation();
+
+                // Deselect previous room
+                if (this.selectedRoom) {
+                    this.selectedRoom.element.classList.remove('selected');
+                }
+
+                // Select new room
+                this.selectedRoom = room;
+                room.element.classList.add('selected');
+
+                // Update UI
+                this.highlightRoomCard(room.id);
+
+                // Center on room (optional)
+                // this.centerOnRoom(room);
+
+                console.log('Selected room:', room);
+            }
+
+            handleRoomHover(room, event) {
+                this.showTooltip(room, event);
+            }
+
+            showTooltip(room, event) {
+                this.tooltipTitle.textContent = room.name;
+                this.tooltipContent.innerHTML = `
+                    <strong>Status:</strong> ${room.status}<br>
+                    <strong>Capacity:</strong> ${room.capacity} people<br>
+                    <strong>Floor:</strong> ${room.floor}<br>
+                    <strong>Area:</strong> ~${room.area} m²
+                `;
+
+                this.tooltip.classList.add('show');
+                this.updateTooltipPosition(event);
+            }
+
+            updateTooltipPosition(event) {
+                const tooltipRect = this.tooltip.getBoundingClientRect();
+                let x = event.clientX + 15;
+                let y = event.clientY + 15;
+
+                // Keep tooltip in viewport
+                if (x + tooltipRect.width > window.innerWidth) {
+                    x = event.clientX - tooltipRect.width - 15;
+                }
+                if (y + tooltipRect.height > window.innerHeight) {
+                    y = event.clientY - tooltipRect.height - 15;
+                }
+
+                this.tooltip.style.left = x + 'px';
+                this.tooltip.style.top = y + 'px';
+            }
+
+            hideTooltip() {
+                this.tooltip.classList.remove('show');
+            }
+
+            updateRoomList() {
+                this.roomList.innerHTML = '';
+
+                this.filteredRooms.forEach(room => {
+                    const card = document.createElement('div');
+                    card.className = 'room-card';
+                    card.setAttribute('data-room-id', room.id);
+
+                    if (this.selectedRoom && this.selectedRoom.id === room.id) {
+                        card.classList.add('selected');
+                    }
+
+                    card.innerHTML = `
+                        <h3>${room.name}</h3>
+                        <div class="room-details">
+                            <div class="room-detail">
+                                <span class="icon">👥</span>
+                                <span>${room.capacity}</span>
+                            </div>
+                            <div class="room-detail">
+                                <span class="icon">🏢</span>
+                                <span>Floor ${room.floor}</span>
+                            </div>
+                            <div class="room-detail">
+                                <span class="icon">📐</span>
+                                <span>${room.area} m²</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="status-badge status-${room.status}">${room.status}</span>
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        this.handleRoomClick(room, { stopPropagation: () => { } });
+                        this.centerOnRoom(room);
+                    });
+
+                    this.roomList.appendChild(card);
+                });
+            }
+
+            highlightRoomCard(roomId) {
+                const cards = this.roomList.querySelectorAll('.room-card');
+                cards.forEach(card => {
+                    if (card.getAttribute('data-room-id') === roomId) {
+                        card.classList.add('selected');
+                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            }
+
+            updateStats() {
+                const available = this.rooms.filter(r => r.status === 'available').length;
+                const occupied = this.rooms.filter(r => r.status === 'occupied').length;
+                const maintenance = this.rooms.filter(r => r.status === 'maintenance').length;
+
+                document.getElementById('availableCount').textContent = available;
+                document.getElementById('occupiedCount').textContent = occupied;
+                document.getElementById('maintenanceCount').textContent = maintenance;
+                document.getElementById('totalCount').textContent = this.rooms.length;
+            }
+
+            centerOnRoom(room) {
+                if (!room.bounds) return;
+
+                const containerRect = this.mapContainer.getBoundingClientRect();
+                const svgRect = this.svg.getBoundingClientRect();
+
+                // Calculate center of room in SVG coordinates
+                const roomCenterX = room.bounds.x + room.bounds.width / 2;
+                const roomCenterY = room.bounds.y + room.bounds.height / 2;
+
+                // Calculate where to translate to center the room
+                const targetX = containerRect.width / 2 - roomCenterX * this.zoom;
+                const targetY = containerRect.height / 2 - roomCenterY * this.zoom;
+
+                this.translateX = targetX;
+                this.translateY = targetY;
+                this.updateTransform();
+            }
+
+            initEventListeners() {
+                // Zoom controls
+                document.getElementById('zoomIn').addEventListener('click', () => this.zoomIn());
+                document.getElementById('zoomOut').addEventListener('click', () => this.zoomOut());
+                document.getElementById('resetView').addEventListener('click', () => this.resetView());
+                document.getElementById('fitToScreen').addEventListener('click', () => this.fitToScreen());
+
+                // Mouse wheel zoom
+                this.mapContainer.addEventListener('wheel', (e) => this.handleWheel(e));
+
+                // Pan with mouse
+                this.mapContainer.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.mapContainer.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.mapContainer.addEventListener('mouseup', () => this.handleMouseUp());
+                this.mapContainer.addEventListener('mouseleave', () => this.handleMouseUp());
+
+                // Sidebar toggle
+                document.getElementById('toggleSidebar').addEventListener('click', () => {
+                    this.sidebar.classList.toggle('collapsed');
+                });
+
+                // Search
+                this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+
+                // Filters
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.currentFilter = btn.getAttribute('data-filter');
+                        this.applyFilters();
+                    });
+                });
+
+                // Deselect room when clicking on empty space
+                this.mapContainer.addEventListener('click', (e) => {
+                    if (e.target === this.mapContainer || e.target === this.mapWrapper) {
+                        if (this.selectedRoom) {
+                            this.selectedRoom.element.classList.remove('selected');
+                            this.selectedRoom = null;
+                            this.roomList.querySelectorAll('.room-card').forEach(card => {
+                                card.classList.remove('selected');
+                            });
+                        }
+                    }
+                });
+            }
+
+            handleSearch(query) {
+                const lowerQuery = query.toLowerCase();
+                this.filteredRooms = this.rooms.filter(room => {
+                    const matchesSearch = room.name.toLowerCase().includes(lowerQuery) ||
+                        room.id.toLowerCase().includes(lowerQuery);
+                    const matchesFilter = this.currentFilter === 'all' || room.status === this.currentFilter;
+                    return matchesSearch && matchesFilter;
+                });
+
+                this.updateRoomList();
+                this.highlightFilteredRooms();
+            }
+
+            applyFilters() {
+                const query = this.searchInput.value.toLowerCase();
+                this.filteredRooms = this.rooms.filter(room => {
+                    const matchesSearch = !query ||
+                        room.name.toLowerCase().includes(query) ||
+                        room.id.toLowerCase().includes(query);
+                    const matchesFilter = this.currentFilter === 'all' || room.status === this.currentFilter;
+                    return matchesSearch && matchesFilter;
+                });
+
+                this.updateRoomList();
+                this.highlightFilteredRooms();
+            }
+
+            highlightFilteredRooms() {
+                this.rooms.forEach(room => {
+                    if (this.filteredRooms.includes(room)) {
+                        room.element.style.opacity = '1';
+                    } else {
+                        room.element.style.opacity = '0.2';
+                    }
+                });
+            }
+
+            handleWheel(event) {
+                event.preventDefault();
+
+                const delta = event.deltaY > 0 ? 0.9 : 1.1;
+                const newZoom = this.zoom * delta;
+
+                if (newZoom >= this.minZoom && newZoom <= this.maxZoom) {
+                    const rect = this.mapContainer.getBoundingClientRect();
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+
+                    // Zoom towards mouse position
+                    this.translateX = mouseX - (mouseX - this.translateX) * delta;
+                    this.translateY = mouseY - (mouseY - this.translateY) * delta;
+                    this.zoom = newZoom;
+
+                    this.updateTransform();
+                }
+            }
+
+            handleMouseDown(event) {
+                if (event.target.classList.contains('room-polygon')) return;
+
+                this.isDragging = true;
+                this.startX = event.clientX - this.translateX;
+                this.startY = event.clientY - this.translateY;
+                this.mapContainer.classList.add('grabbing');
+            }
+
+            handleMouseMove(event) {
+                if (!this.isDragging) return;
+
+                this.translateX = event.clientX - this.startX;
+                this.translateY = event.clientY - this.startY;
+                this.updateTransform();
+            }
+
+            handleMouseUp() {
+                this.isDragging = false;
+                this.mapContainer.classList.remove('grabbing');
+            }
+
+            zoomIn() {
+                if (this.zoom < this.maxZoom) {
+                    this.zoom *= 1.2;
+                    this.updateTransform();
+                }
+            }
+
+            zoomOut() {
+                if (this.zoom > this.minZoom) {
+                    this.zoom /= 1.2;
+                    this.updateTransform();
+                }
+            }
+
+            resetView() {
+                this.zoom = 1;
+                this.translateX = 0;
+                this.translateY = 0;
+                this.updateTransform();
+            }
+
+            fitToScreen() {
+                if (!this.svg) return;
+
+                const containerRect = this.mapContainer.getBoundingClientRect();
+                const svgRect = this.svg.getBoundingClientRect();
+
+                // Calculate zoom to fit
+                const scaleX = (containerRect.width * 0.9) / svgRect.width;
+                const scaleY = (containerRect.height * 0.9) / svgRect.height;
+                this.zoom = Math.min(scaleX, scaleY);
+
+                // Center the map
+                this.translateX = (containerRect.width - svgRect.width * this.zoom) / 2;
+                this.translateY = (containerRect.height - svgRect.height * this.zoom) / 2;
+
+                this.updateTransform();
+            }
+
+            updateTransform() {
+                this.mapWrapper.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.zoom})`;
+                document.getElementById('zoomLevel').textContent = `${Math.round(this.zoom * 100)}%`;
+            }
+        }
+
+        // Initialize the map when page loads
+        let map;
+        document.addEventListener('DOMContentLoaded', () => {
+            map = new InteractiveMap();
+        });
+    </script>
+</body>
+
+</html>
