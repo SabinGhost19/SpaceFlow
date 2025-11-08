@@ -79,6 +79,19 @@ export const Navbar = () => {
                 Map
               </Button>
             </Link>
+            <Link to="/ai-event-planner">
+              <Button
+                variant="ghost"
+                className={`transition-all duration-300 text-white font-semibold px-5 py-2 rounded-lg
+                  ${isActive("/ai-event-planner")
+                    ? "bg-white/10 text-amber-400"
+                    : "hover:bg-white/10 hover:text-amber-400"
+                  }`}
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                AI Planner
+              </Button>
+            </Link>
             {isAuthenticated && user && (user as any).is_manager && (
               <Link to="/suggest-event">
                 <Button
