@@ -133,16 +133,18 @@ export const FloorPlanWithObjects: React.FC<FloorPlanWithObjectsProps> = ({
     // Load image to get dimensions
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.target as HTMLImageElement;
+        const displayWidth = img.clientWidth;
+        const displayHeight = img.clientHeight;
         console.log('🖼️ Image loaded:', {
             naturalWidth: img.naturalWidth,
             naturalHeight: img.naturalHeight,
-            displayWidth: img.width,
-            displayHeight: img.height
+            displayWidth: displayWidth,
+            displayHeight: displayHeight
         });
-        // Use actual image dimensions from the loaded image
+        // Use the displayed dimensions (after object-contain scaling)
         setImageDimensions({
-            width: img.naturalWidth,
-            height: img.naturalHeight
+            width: displayWidth,
+            height: displayHeight
         });
         setImageLoaded(true);
     };
@@ -211,7 +213,7 @@ export const FloorPlanWithObjects: React.FC<FloorPlanWithObjectsProps> = ({
                 <img
                     src={imageSrc}
                     alt="Floor Plan"
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className="w-full h-full object-contain"
                     onLoad={handleImageLoad}
                     onError={(e) => {
                         console.error('❌ Error loading image:', imageSrc);
@@ -244,128 +246,117 @@ export const FloorPlanWithObjects: React.FC<FloorPlanWithObjectsProps> = ({
                     </div>
                 )}
 
-                {/* Overlay Container - aligned with image using object-contain */}
+                {/* Overlay Container - aligned with image top-left corner */}
                 {imageLoaded && objects.length > 0 && (
                     <div
-                        className="absolute inset-0 w-full h-full flex items-center justify-center"
-                        style={{ pointerEvents: 'none' }}
+                        className="absolute top-0 left-0"
+                        style={{
+                            pointerEvents: 'none',
+                            width: `${imageDimensions.width}px`,
+                            height: `${imageDimensions.height}px`,
+                        }}
                     >
-                        {/* Container that matches the actual displayed image size */}
-                        <div
-                            className="relative"
-                            style={{
-                                width: `${imageDimensions.width}px`,
-                                height: `${imageDimensions.height}px`,
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                aspectRatio: `${imageDimensions.width} / ${imageDimensions.height}`,
-                                // Debug border - remove after testing
-                                // border: '2px solid red',
-                                // boxSizing: 'border-box',
-                            }}
-                        >
-                            {/* React Components for each SVG object */}
-                            {objects.map((obj) => {
-                                const coords = convertCoordinates(obj);
-                                const isHovered = hoveredObject === obj.id;
+                        {/* React Components for each SVG object */}
+                        {objects.map((obj) => {
+                            const coords = convertCoordinates(obj);
+                            const isHovered = hoveredObject === obj.id;
 
-                                // Log pentru primul obiect
-                                if (obj.id === 'rect1') {
-                                    console.log(`🎨 Rendering ${obj.id}:`, {
-                                        percentages: coords,
-                                        containerSize: { w: imageDimensions.width, h: imageDimensions.height },
-                                        actualPixels: {
-                                            x: (coords.x / 100) * imageDimensions.width,
-                                            y: (coords.y / 100) * imageDimensions.height,
-                                            w: (coords.width / 100) * imageDimensions.width,
-                                            h: (coords.height / 100) * imageDimensions.height,
-                                        }
-                                    });
-                                }
+                            // Log pentru primul obiect
+                            if (obj.id === 'rect1') {
+                                console.log(`🎨 Rendering ${obj.id}:`, {
+                                    percentages: coords,
+                                    containerSize: { w: imageDimensions.width, h: imageDimensions.height },
+                                    actualPixels: {
+                                        x: (coords.x / 100) * imageDimensions.width,
+                                        y: (coords.y / 100) * imageDimensions.height,
+                                        w: (coords.width / 100) * imageDimensions.width,
+                                        h: (coords.height / 100) * imageDimensions.height,
+                                    }
+                                });
+                            }
 
-                                return (
-                                    <Tooltip key={obj.id}>
-                                        <TooltipTrigger asChild>
-                                            <div
-                                                className="absolute cursor-pointer transition-all duration-200"
-                                                style={{
-                                                    left: `${coords.x}%`,
-                                                    top: `${coords.y}%`,
-                                                    width: `${coords.width}%`,
-                                                    height: `${coords.height}%`,
-                                                    backgroundColor: isHovered
-                                                        ? obj.fill
-                                                        : `${obj.fill}80`, // Add transparency
-                                                    opacity: isHovered ? 0.9 : 0.6,
-                                                    border: isHovered ? '3px solid white' : '2px solid rgba(255,255,255,0.5)',
-                                                    boxShadow: isHovered
-                                                        ? '0 4px 12px rgba(0,0,0,0.4)'
-                                                        : '0 2px 4px rgba(0,0,0,0.2)',
-                                                    transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-                                                    zIndex: isHovered ? 20 : 10,
-                                                    pointerEvents: 'auto',
-                                                    borderRadius: '2px',
-                                                }}
-                                                onMouseEnter={() => setHoveredObject(obj.id)}
-                                                onMouseLeave={() => setHoveredObject(null)}
-                                            />
-                                        </TooltipTrigger>
-                                        <TooltipContent
-                                            side="top"
-                                            className="max-w-sm bg-slate-900 text-white border-slate-700"
-                                        >
-                                            <div className="space-y-2">
-                                                <div className="font-bold text-lg border-b border-slate-700 pb-2">
-                                                    {obj.id}
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <div>
-                                                        <span className="text-slate-400">Type:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.type}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-slate-400">Fill:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.fill}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-slate-400">X:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.x.toFixed(1)}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-slate-400">Y:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.y.toFixed(1)}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-slate-400">Width:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.width.toFixed(1)}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-slate-400">Height:</span>
-                                                        <span className="ml-2 text-white font-medium">{obj.height.toFixed(1)}</span>
-                                                    </div>
-                                                </div>
-                                                {Object.keys(obj.properties).length > 0 && (
-                                                    <div className="mt-3 pt-2 border-t border-slate-700">
-                                                        <div className="text-xs text-slate-400 mb-1">Properties:</div>
-                                                        <div className="text-xs space-y-1 max-h-32 overflow-y-auto">
-                                                            {Object.entries(obj.properties)
-                                                                .filter(([key]) => !['x', 'y', 'width', 'height', 'style'].includes(key))
-                                                                .map(([key, value]) => (
-                                                                    <div key={key} className="flex gap-2">
-                                                                        <span className="text-slate-400">{key}:</span>
-                                                                        <span className="text-white font-mono">{value}</span>
-                                                                    </div>
-                                                                ))
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                )}
+                            return (
+                                <Tooltip key={obj.id}>
+                                    <TooltipTrigger asChild>
+                                        <div
+                                            className="absolute cursor-pointer transition-all duration-200"
+                                            style={{
+                                                left: `${coords.x}%`,
+                                                top: `${coords.y}%`,
+                                                width: `${coords.width}%`,
+                                                height: `${coords.height}%`,
+                                                backgroundColor: isHovered
+                                                    ? obj.fill
+                                                    : `${obj.fill}80`, // Add transparency
+                                                opacity: isHovered ? 0.9 : 0.6,
+                                                border: isHovered ? '3px solid white' : '2px solid rgba(255,255,255,0.5)',
+                                                boxShadow: isHovered
+                                                    ? '0 4px 12px rgba(0,0,0,0.4)'
+                                                    : '0 2px 4px rgba(0,0,0,0.2)',
+                                                transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                                                zIndex: isHovered ? 20 : 10,
+                                                pointerEvents: 'auto',
+                                                borderRadius: '2px',
+                                            }}
+                                            onMouseEnter={() => setHoveredObject(obj.id)}
+                                            onMouseLeave={() => setHoveredObject(null)}
+                                        />
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                        side="top"
+                                        className="max-w-sm bg-slate-900 text-white border-slate-700"
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="font-bold text-lg border-b border-slate-700 pb-2">
+                                                {obj.id}
                                             </div>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                );
-                            })}
-                        </div>
+                                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                                <div>
+                                                    <span className="text-slate-400">Type:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.type}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400">Fill:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.fill}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400">X:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.x.toFixed(1)}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400">Y:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.y.toFixed(1)}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400">Width:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.width.toFixed(1)}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400">Height:</span>
+                                                    <span className="ml-2 text-white font-medium">{obj.height.toFixed(1)}</span>
+                                                </div>
+                                            </div>
+                                            {Object.keys(obj.properties).length > 0 && (
+                                                <div className="mt-3 pt-2 border-t border-slate-700">
+                                                    <div className="text-xs text-slate-400 mb-1">Properties:</div>
+                                                    <div className="text-xs space-y-1 max-h-32 overflow-y-auto">
+                                                        {Object.entries(obj.properties)
+                                                            .filter(([key]) => !['x', 'y', 'width', 'height', 'style'].includes(key))
+                                                            .map(([key, value]) => (
+                                                                <div key={key} className="flex gap-2">
+                                                                    <span className="text-slate-400">{key}:</span>
+                                                                    <span className="text-white font-mono">{value}</span>
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TooltipContent>
+                                </Tooltip>
+                            );
+                        })}
                     </div>
                 )}
 
