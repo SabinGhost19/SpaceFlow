@@ -36,21 +36,32 @@ export const BeerMug3D = () => {
         containerRef.current.appendChild(renderer.domElement);
         rendererRef.current = renderer;
 
-        // Add lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        // Add lights - Enhanced brightness
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
         directionalLight.position.set(10, 10, 10);
         scene.add(directionalLight);
 
-        const pointLight = new THREE.PointLight(0xffffff, 0.5);
+        const directionalLight2 = new THREE.DirectionalLight(0xffd700, 1.5);
+        directionalLight2.position.set(-10, 5, 5);
+        scene.add(directionalLight2);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.2);
         pointLight.position.set(-5, -5, -5);
         scene.add(pointLight);
 
-        const spotLight = new THREE.SpotLight(0xffffff, 1);
+        const spotLight = new THREE.SpotLight(0xffffff, 1.8);
         spotLight.position.set(10, 10, 10);
+        spotLight.angle = Math.PI / 6;
+        spotLight.penumbra = 0.3;
         scene.add(spotLight);
+
+        // Add fill light from bottom
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        fillLight.position.set(0, -10, 0);
+        scene.add(fillLight);
 
         // Load GLTF model
         const loader = new GLTFLoader();

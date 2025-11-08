@@ -12,6 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { 
   Dialog,
   DialogContent,
   DialogDescription,
@@ -31,6 +36,9 @@ import {
   Calendar as CalendarIcon,
   DollarSign,
   ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Settings,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import api, { 
@@ -118,6 +126,8 @@ const AIEventPlanner = () => {
     },
   ]);
   const [generalPreferences, setGeneralPreferences] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isExplicitMode, setIsExplicitMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   // Suggestions state
