@@ -156,31 +156,18 @@ class EventSuggestionService:
         system_prompt = """You are an intelligent event planning assistant. Your task is to parse natural language descriptions of events into structured activity data.
 
 CRITICAL REQUIREMENTS:
-1. EVERY activity MUST have both "start_time" and "end_time" in "HH:00" format (24-hour format, ALWAYS at exact hours)
-2. ALL times MUST be at exact hours (00 minutes): 09:00, 10:00, 14:00, 15:00, etc.
-3. NEVER use minutes other than :00 (e.g., NEVER use 09:30, 14:45, etc.)
-4. Parse relative times correctly and round to nearest hour
-5. If no participant count is mentioned, assume 1 person (DEFAULT)
-6. Extract date information from the prompt, including relative dates
-7. Identify required amenities from the description
-8. Each activity should be a separate booking
-9. Support both English and Romanian language
+1. Preserve any explicit times provided in the text exactly (e.g., "09:00", "13:30"). Do NOT alter or round explicit times.
+2. If times are ambiguous or relative (e.g., "in 2 hours", "after lunch"), infer and round sensibly to the nearest hour when needed.
+3. If no participant count is mentioned, assume 1 person (DEFAULT).
+4. Extract date information from the prompt (including relative dates like today/tomorrow) but prefer any explicit calendar date if provided.
+5. Identify required amenities from the description (e.g., projector, whiteboard, video conference, WiFi).
+6. Each activity should be a separate booking.
+7. Support both English and Romanian language.
 
-TIME PARSING RULES (ALWAYS ROUND TO EXACT HOURS):
-- "in X hours" / "în X ore" = current hour + X hours (e.g., if now is 14:00 and user says "in 2 hours" → 16:00)
-- "in X minutes" / "în X minute" = round up to next hour
-- "tomorrow" / "mâine" = next day at reasonable hour (e.g., 09:00 or 10:00)
-- "today" / "azi" / "astăzi" = current date
-- "pentru X ore" (for X hours) = duration of X hours starting at next available round hour
-- Specific times: round to nearest hour (e.g., "3:30pm" → "15:00" or "16:00", "la 14:45" → "15:00")
-- If only duration given (e.g., "for 2 hours"), start at next available hour
-
-EXAMPLES OF CORRECT TIME ROUNDING:
-- Current time 14:23, "in 2 hours" → start_time: "16:00"
-- Current time 09:45, "in 1 hour" → start_time: "11:00"
-- "tomorrow at 3pm" → start_time: "15:00"
-- "at 14:30" → start_time: "15:00" (round up)
-- "for 3 hours" starting now (14:23) → start_time: "15:00", end_time: "18:00"
+TIME PARSING GUIDELINES:
+- If a line already has both start and end times (e.g., "from 09:00 to 11:00"), keep those exact values.
+- If a specific minute is given (e.g., 14:30), keep it. Only round when the text is imprecise.
+- For relative expressions ("in X hours/minutes", "for X hours"), compute from the provided context and round to the nearest hour as needed.
 
 AMENITY KEYWORDS (English & Romanian):
 - "projector", "projection", "screen", "videoproiector", "proiector" → "Projector"
@@ -188,10 +175,9 @@ AMENITY KEYWORDS (English & Romanian):
 - "video", "zoom", "teams", "conference call", "videoconferință" → "Video Conference"
 - "wifi", "internet" → "WiFi"
 
-MANDATORY: 
-- Never set start_time or end_time to null or omit them
-- ALWAYS use HH:00 format (exact hours only, minutes must be :00)
-- If you cannot determine times, DO NOT include that activity
+MANDATORY:
+- Do not output activities missing start_time or end_time.
+- Return valid JSON only using the schema below (no extra commentary).
 
 You must respond with valid JSON only, following this exact structure:
 {
@@ -199,8 +185,8 @@ You must respond with valid JSON only, following this exact structure:
     "activities": [
         {
             "name": "Activity name",
-            "start_time": "HH:00",  // REQUIRED - Always exact hour (e.g., "09:00", "14:00")
-            "end_time": "HH:00",    // REQUIRED - Always exact hour (e.g., "11:00", "16:00")
+            "start_time": "HH:MM",
+            "end_time": "HH:MM",
             "participants_count": 1,
             "required_amenities": ["Projector", "Whiteboard"],
             "preferences": "any specific preferences"
@@ -234,14 +220,11 @@ CRITICAL INSTRUCTIONS:
 3. If user says "today"/"azi"/"astăzi":
    - If no calendar date provided, use {current_date.isoformat()}
    - If calendar date IS provided, USE THE CALENDAR DATE
-4. Calculate relative times based on ROUNDED current hour ({current_time} on {current_day_name})
-5. ALWAYS round times to exact hours (HH:00 format only)
-3. AVOID suggesting times that conflict with user's existing bookings
-4. Extract ALL activities with EXACT HOUR time slots (e.g., 09:00, 10:00, 14:00, NOT 09:30, 14:45)
-5. If user says "available room" without specific time, use next available hour ({next_slot})
-6. For participant counts: default to 1 if not specified
-7. Extract amenities from keywords in the request
-8. NEVER use minutes other than :00
+4. Calculate relative times based on current context; preserve explicit times from the request without rounding.
+5. AVOID suggesting or inventing times. Use only times that are either explicit in the text or clearly inferred from relative expressions.
+6. If user says "available room" without specific time, use next available hour ({next_slot}).
+7. For participant counts: default to 1 if not specified.
+8. Extract amenities from keywords in the request.
 
 EXAMPLES (ALL times at exact hours):
 - Current hour {current_time}, "in 2 hours" → start_time: "{(rounded_now + timedelta(hours=2)).strftime('%H:00')}"
@@ -252,8 +235,6 @@ EXAMPLES (ALL times at exact hours):
 - "pentru 2 ore" (for 2 hours) → start_time: "{next_slot}", end_time: "{(rounded_now + timedelta(hours=3)).strftime('%H:00')}"
 - "cameră de meeting mâine" → booking_date: "{tomorrow_date.isoformat()}", start_time: "09:00" or "10:00"
 
-REMEMBER: All times MUST be at exact hours (minutes = :00). Round up if necessary.
-
 Respond with JSON only."""
 
         try:
@@ -263,14 +244,12 @@ Respond with JSON only."""
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=0.7,
-                max_tokens=1000,
+                temperature=0.6,
+                max_tokens=900,
                 response_format={"type": "json_object"},
             )
-            
             ai_response = json.loads(response.choices[0].message.content)
             return ai_response
-            
         except Exception as e:
             print(f"OpenAI API error while parsing prompt: {e}")
             raise ValueError(f"Failed to parse event request: {str(e)}")
@@ -305,6 +284,11 @@ IMPORTANT: All rooms provided to you are ALREADY VERIFIED as available for the r
 You only need to select the BEST room based on the activity requirements and characteristics.
 
 DEFAULT: If participants count is 1, any room size is acceptable, but prefer smaller rooms for efficiency.
+
+HARD CONSTRAINTS (must be satisfied):
+- Room capacity MUST be >= participants_count
+- Room MUST contain ALL required_amenities listed for the activity
+- If no provided room satisfies all required_amenities, return "suggested_room_id": null and explain the gap
 
 You must respond with valid JSON only, following this exact structure:
 {
@@ -341,14 +325,12 @@ Respond with JSON only."""
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=0.7,
-                max_tokens=500,
+                temperature=0.5,
+                max_tokens=450,
                 response_format={"type": "json_object"},
             )
-            
             ai_response = json.loads(response.choices[0].message.content)
             return ai_response
-            
         except Exception as e:
             print(f"OpenAI API error: {e}")
             # Fallback to simple logic
@@ -544,10 +526,28 @@ Respond with JSON only."""
                 )
                 continue
             
-            # Get AI suggestion
+            # Enforce hard constraints before AI: capacity and required amenities
+            participants_needed = activity.participants_count or 1
+            filtered_rooms = [r for r in available_rooms if r.capacity >= participants_needed]
+            if activity.required_amenities:
+                req = set(activity.required_amenities)
+                filtered_rooms = [
+                    r for r in filtered_rooms
+                    if all(amenity in (r.amenities or []) for amenity in req)
+                ]
+            
+            if not filtered_rooms:
+                warnings.append(
+                    f"No rooms match constraints for '{activity.name}' (capacity {participants_needed}"
+                    + (f", amenities: {', '.join(activity.required_amenities)}" if activity.required_amenities else "")
+                    + ") at the requested time."
+                )
+                continue
+
+            # Get AI suggestion using only constraint-satisfying rooms
             ai_result = await self._get_ai_room_suggestion(
                 activity=activity,
-                available_rooms=available_rooms,
+                available_rooms=filtered_rooms,
                 general_preferences=general_preferences,
             )
             

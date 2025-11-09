@@ -48,6 +48,7 @@ import api, {
   ActivitySuggestion,
   RoomSuggestion 
 } from "@/lib/api";
+import { importCalendarPrompt } from "@/lib/googleCalendar";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Predefined activity types
@@ -130,6 +131,7 @@ const AIEventPlannerNew = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isExplicitMode, setIsExplicitMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCalendarLoading, setIsCalendarLoading] = useState(false);
   
   // Suggestions state
   const [suggestions, setSuggestions] = useState<EventSuggestionResponse | null>(null);
@@ -296,6 +298,35 @@ const AIEventPlannerNew = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImportCalendar = async () => {
+    if (!selectedDate) {
+      toast({
+        title: "Select Date",
+        description: "Please choose a date first to import calendar events",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsCalendarLoading(true);
+    try {
+      const prompt = await importCalendarPrompt(selectedDate);
+      // Append or replace? We'll append below existing text separated by blank line if user already typed.
+      setAiPrompt((prev) => (prev.trim() ? prev + "\n\n" + prompt : prompt));
+      toast({
+        title: "Calendar Imported",
+        description: "Events added to the prompt textbox. Review or edit before requesting suggestions.",
+      });
+    } catch (e: any) {
+      toast({
+        title: "Import Failed",
+        description: e.message || "Could not fetch calendar events.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCalendarLoading(false);
     }
   };
 
@@ -539,6 +570,27 @@ const AIEventPlannerNew = () => {
                   className="min-h-[180px] bg-slate-900/70 border-slate-600 text-white text-base resize-none focus:border-amber-400 focus:ring-amber-400"
                   rows={8}
                 />
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleImportCalendar}
+                    disabled={isCalendarLoading}
+                    className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
+                  >
+                    {isCalendarLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Importing...
+                      </>
+                    ) : (
+                      <>
+                        <CalendarIcon className="h-4 w-4 mr-2" />
+                        Import Events for Selected Date
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <p className="text-slate-400 text-sm flex items-start gap-2">
                   <Lightbulb className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-400" />
                   <span>
