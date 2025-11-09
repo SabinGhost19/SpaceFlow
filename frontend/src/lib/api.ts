@@ -13,6 +13,7 @@ export interface UserCreate {
   password: string;
   full_name?: string;
   is_manager?: boolean;
+  avatar_url?: string;
 }
 
 export interface UserLogin {
@@ -24,6 +25,7 @@ export interface UserUpdate {
   email?: string;
   username?: string;
   full_name?: string;
+  avatar_url?: string;
   password?: string;
 }
 
@@ -32,6 +34,7 @@ export interface UserResponse {
   email: string;
   username: string;
   full_name: string | null;
+  avatar_url: string | null;
   is_active: boolean;
   is_manager: boolean;
   created_at: string;
@@ -150,9 +153,30 @@ export interface BulkBookingConfirmation {
 
 export interface BulkBookingResponse {
   created_bookings: number[];
-  failed_bookings: Array<{ activity: string; error: string }>;
+  failed_bookings: { activity: string; error: string }[];
   success_count: number;
   failure_count: number;
+}
+
+// Avatar Types
+export interface Avatar {
+  id: string;
+  url: string;
+  style: string;
+  seed: string;
+}
+
+export interface AvatarListResponse {
+  avatars: Avatar[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
+  style: string;
 }
 
 // Auth API
@@ -369,12 +393,48 @@ export const eventSuggestionAPI = {
   },
 };
 
+// Avatar API
+export const avatarAPI = {
+  /**
+   * Get available avatar styles
+   */
+  getStyles: async (): Promise<string[]> => {
+    const response = await apiClient.get<string[]>('/avatars/styles');
+    return response.data;
+  },
+
+  /**
+   * Get paginated list of avatars
+   */
+  getAvatars: async (
+    style: string = 'avataaars',
+    page: number = 1,
+    perPage: number = 20
+  ): Promise<AvatarListResponse> => {
+    const response = await apiClient.get<AvatarListResponse>('/avatars/list', {
+      params: { style, page, per_page: perPage },
+    });
+    return response.data;
+  },
+
+  /**
+   * Generate custom avatar
+   */
+  generateCustom: async (style: string, seed: string): Promise<Avatar> => {
+    const response = await apiClient.get<Avatar>('/avatars/generate', {
+      params: { style, seed },
+    });
+    return response.data;
+  },
+};
+
 // Export combined API
 const api = {
   auth: authAPI,
   users: userAPI,
   bookings: bookingAPI,
   eventSuggestions: eventSuggestionAPI,
+  avatars: avatarAPI,
 };
 
 export default api;

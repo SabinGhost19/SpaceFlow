@@ -12,6 +12,7 @@ class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
     full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 
 # Schema for creating a new user
@@ -19,6 +20,7 @@ class UserCreate(UserBase):
     """Schema for user registration/signup."""
     password: str = Field(..., min_length=8, max_length=100)
     is_manager: bool = Field(default=False, description="Whether the user is a manager")
+    avatar_url: Optional[str] = None
 
 
 # Schema for user login
@@ -34,6 +36,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = Field(None, min_length=3, max_length=50)
     full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
     password: Optional[str] = Field(None, min_length=8, max_length=100)
 
 

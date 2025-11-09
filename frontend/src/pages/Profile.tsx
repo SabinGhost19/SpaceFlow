@@ -7,12 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Calendar, Clock, Mail, User, Bell, Shield, Loader2 } from "lucide-react";
+import { Calendar, Clock, Mail, User, Bell, Shield, Loader2, Camera } from "lucide-react";
 import { mockBookings } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import api, { BookingResponse } from "@/lib/api";
+import AvatarPicker from "@/components/AvatarPicker";
 
 const Profile = () => {
   const { user, logout, refreshUser } = useAuth();
@@ -22,6 +23,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || "");
 
   // Load bookings on component mount
   useEffect(() => {
@@ -53,6 +56,7 @@ const Profile = () => {
       await api.users.updateCurrentUser({
         full_name: name,
         email,
+        avatar_url: avatarUrl || undefined,
       });
       await refreshUser();
       toast({
@@ -68,6 +72,14 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAvatarSelect = (selectedAvatarUrl: string) => {
+    setAvatarUrl(selectedAvatarUrl);
+    toast({
+      title: "Avatar Selected",
+      description: "Don't forget to save your changes!",
+    });
   };
 
   const handleLogout = async () => {
@@ -138,14 +150,29 @@ const Profile = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center gap-6">
-                    <Avatar className="h-24 w-24">
-                      <AvatarFallback className="bg-amber-500 text-slate-900 text-2xl font-bold">{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-24 w-24">
+                        {avatarUrl ? (
+                          <AvatarImage src={avatarUrl} alt={user.username} />
+                        ) : (
+                          <AvatarFallback className="bg-amber-500 text-slate-900 text-2xl font-bold">
+                            {user.username.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <Button
+                        size="icon"
+                        onClick={() => setShowAvatarPicker(true)}
+                        className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900"
+                      >
+                        <Camera className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <div>
                       <h3 className="font-semibold text-lg text-white">{user.username}</h3>
                       <p className="text-sm text-slate-300">{user.email}</p>
-                      {user.is_superuser && (
-                        <Badge variant="secondary" className="mt-1 bg-amber-500 text-slate-900">Admin</Badge>
+                      {user.is_manager && (
+                        <Badge variant="secondary" className="mt-1 bg-amber-500 text-slate-900">Manager</Badge>
                       )}
                     </div>
                   </div>
@@ -202,7 +229,7 @@ const Profile = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-3xl font-bold text-amber-400 mb-1">
-                        {user.is_superuser ? "Admin" : "User"}
+                        {user.is_manager ? "Manager" : "User"}
                       </div>
                       <div className="text-sm text-slate-300">Account Type</div>
                     </div>
@@ -345,6 +372,14 @@ const Profile = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Avatar Picker Dialog */}
+      <AvatarPicker
+        open={showAvatarPicker}
+        onOpenChange={setShowAvatarPicker}
+        onSelect={handleAvatarSelect}
+        currentAvatar={avatarUrl}
+      />
     </div>
   );
 };

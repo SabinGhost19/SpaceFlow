@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.database import init_db
-from app.api.routes import auth, users, rooms, bookings, events, event_suggestions
+from app.api.routes import auth, users, rooms, bookings, events, event_suggestions, avatars
 
 # Configure logging
 logging.basicConfig(
@@ -94,6 +94,12 @@ app.include_router(
     event_suggestions.router,
     prefix=f"{settings.API_V1_STR}/event-suggestions",
     tags=["event-suggestions"]
+)
+
+app.include_router(
+    avatars.router,
+    prefix=f"{settings.API_V1_STR}/avatars",
+    tags=["avatars"]
 )
 
 

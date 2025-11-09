@@ -128,13 +128,13 @@ export const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-300">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={(user as any).avatar || undefined} alt={(user as any).username || 'User'} />
+                      <AvatarImage src={user.avatar_url || undefined} alt={user.username || 'User'} />
                       <AvatarFallback className="bg-amber-500 text-slate-900 font-bold">
-                        {((user as any).username || 'U').slice(0, 2).toUpperCase()}
+                        {(user.username || 'U').slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-white font-medium">
-                      {(user as any).username || (user as any).full_name}
+                      {user.username || user.full_name}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
