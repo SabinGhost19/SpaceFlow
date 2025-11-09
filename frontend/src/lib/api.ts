@@ -105,8 +105,9 @@ export interface ActivityRequest {
 }
 
 export interface EventSuggestionRequest {
-  booking_date: string; // YYYY-MM-DD format
-  activities: ActivityRequest[];
+  prompt: string; // Natural language description (REQUIRED)
+  booking_date?: string; // YYYY-MM-DD format (optional, can be extracted from prompt)
+  activities?: ActivityRequest[]; // Optional explicit activities (only when user enables detailed mode)
   general_preferences?: string;
 }
 

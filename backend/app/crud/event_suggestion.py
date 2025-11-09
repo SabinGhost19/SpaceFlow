@@ -87,6 +87,74 @@ class EventSuggestionService:
             "preferences": activity.preferences or "None specified",
         }
     
+    async def _parse_prompt_to_activities(
+        self,
+        prompt: str,
+        booking_date: Optional[date] = None,
+        general_preferences: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Use OpenAI to parse natural language prompt into structured activities."""
+        
+        system_prompt = """You are an intelligent event planning assistant. Your task is to parse natural language descriptions of events into structured activity data.
+
+IMPORTANT RULES:
+1. If no participant count is mentioned, assume 1 person (DEFAULT)
+2. Extract date information if present
+3. Extract time slots for each activity
+4. Identify required amenities from the description
+5. Each activity should be a separate booking
+
+You must respond with valid JSON only, following this exact structure:
+{
+    "booking_date": "YYYY-MM-DD" or null if not specified,
+    "activities": [
+        {
+            "name": "Activity name",
+            "start_time": "HH:MM",
+            "end_time": "HH:MM",
+            "participants_count": 1,  // DEFAULT to 1 if not specified
+            "required_amenities": ["amenity1", "amenity2"],
+            "preferences": "any specific preferences"
+        }
+    ],
+    "extracted_preferences": "general preferences extracted from prompt"
+}"""
+
+        user_prompt = f"""Parse the following event request into structured activities.
+
+USER REQUEST:
+{prompt}
+
+CONTEXT:
+- Default participants: 1 person (unless explicitly stated otherwise)
+- Provided date: {booking_date.isoformat() if booking_date else "Not provided"}
+- Additional preferences: {general_preferences or "None"}
+
+Extract all activities with their time slots, participant counts (default to 1), and requirements.
+If the user mentions "we", "team", or "group" without specifying a number, estimate a reasonable count.
+If it's a single person activity (like "I need a room"), use 1 participant.
+
+Respond with JSON only."""
+
+        try:
+            response = await self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.7,
+                max_tokens=1000,
+                response_format={"type": "json_object"},
+            )
+            
+            ai_response = json.loads(response.choices[0].message.content)
+            return ai_response
+            
+        except Exception as e:
+            print(f"OpenAI API error while parsing prompt: {e}")
+            raise ValueError(f"Failed to parse event request: {str(e)}")
+    
     async def _get_ai_room_suggestion(
         self,
         activity: ActivityRequest,
@@ -116,6 +184,8 @@ class EventSuggestionService:
 IMPORTANT: All rooms provided to you are ALREADY VERIFIED as available for the requested time slot. 
 You only need to select the BEST room based on the activity requirements and characteristics.
 
+DEFAULT: If participants count is 1, any room size is acceptable, but prefer smaller rooms for efficiency.
+
 You must respond with valid JSON only, following this exact structure:
 {
     "suggested_room_id": <number>,
@@ -135,10 +205,11 @@ AVAILABLE ROOMS (All verified as available for the time slot):
 {rooms_context}
 
 Analyze and suggest the best room. Consider:
-- Room capacity must be >= participants count (if specified)
+- Room capacity must be >= participants count (default is 1 person)
 - Required amenities must be present
 - Activity type matches room characteristics
 - Overall room suitability
+- For single person bookings, prefer smaller, efficient spaces
 
 Note: All rooms listed are confirmed available for booking at the requested time.
 Respond with JSON only."""
@@ -169,10 +240,9 @@ Respond with JSON only."""
         available_rooms: List[Room],
     ) -> Dict[str, Any]:
         """Fallback logic if AI fails."""
-        # Filter by capacity if specified
-        suitable_rooms = available_rooms
-        if activity.participants_count:
-            suitable_rooms = [r for r in available_rooms if r.capacity >= activity.participants_count]
+        # Filter by capacity if specified (default to 1 if not specified)
+        participants = activity.participants_count or 1
+        suitable_rooms = [r for r in available_rooms if r.capacity >= participants]
         
         if not suitable_rooms:
             suitable_rooms = available_rooms
@@ -196,7 +266,7 @@ Respond with JSON only."""
         return {
             "suggested_room_id": best_room.id,
             "confidence_score": 0.7,
-            "reasoning": "Selected based on capacity and amenities match.",
+            "reasoning": f"Selected based on capacity ({participants} participant(s)) and amenities match.",
             "alternative_room_ids": alternatives,
         }
     
@@ -221,23 +291,81 @@ Respond with JSON only."""
         db: AsyncSession,
         request: EventSuggestionRequest,
     ) -> EventSuggestionResponse:
-        """Generate AI-powered room suggestions for all activities."""
+        """Generate AI-powered room suggestions from prompt or explicit activities."""
         
         suggestions = []
         warnings = []
         
-        for activity in request.activities:
+        # Determine if we're in prompt mode or explicit mode
+        if request.activities is None or len(request.activities) == 0:
+            # PROMPT MODE: Parse the natural language prompt
+            try:
+                parsed_data = await self._parse_prompt_to_activities(
+                    prompt=request.prompt,
+                    booking_date=request.booking_date,
+                    general_preferences=request.general_preferences,
+                )
+                
+                # Extract booking date
+                if not request.booking_date and parsed_data.get("booking_date"):
+                    booking_date = datetime.fromisoformat(parsed_data["booking_date"]).date()
+                elif request.booking_date:
+                    booking_date = request.booking_date
+                else:
+                    raise ValueError("Could not determine booking date from prompt. Please specify a date.")
+                
+                # Extract activities
+                activities_data = parsed_data.get("activities", [])
+                if not activities_data:
+                    raise ValueError("Could not extract any activities from your request. Please be more specific.")
+                
+                # Convert to ActivityRequest objects
+                activities = []
+                for act_data in activities_data:
+                    try:
+                        activity = ActivityRequest(
+                            name=act_data["name"],
+                            start_time=datetime.strptime(act_data["start_time"], "%H:%M").time(),
+                            end_time=datetime.strptime(act_data["end_time"], "%H:%M").time(),
+                            participants_count=act_data.get("participants_count", 1),  # DEFAULT to 1
+                            required_amenities=act_data.get("required_amenities", []),
+                            preferences=act_data.get("preferences"),
+                        )
+                        activities.append(activity)
+                    except Exception as e:
+                        warnings.append(f"Skipped invalid activity: {str(e)}")
+                        continue
+                
+                # Use extracted preferences if not provided
+                if not request.general_preferences and parsed_data.get("extracted_preferences"):
+                    general_preferences = parsed_data["extracted_preferences"]
+                else:
+                    general_preferences = request.general_preferences
+                    
+            except Exception as e:
+                raise ValueError(f"Failed to understand your request: {str(e)}")
+        else:
+            # EXPLICIT MODE: Use provided activities directly
+            activities = request.activities
+            booking_date = request.booking_date
+            general_preferences = request.general_preferences
+            
+            if not booking_date:
+                raise ValueError("Booking date is required when providing explicit activities.")
+        
+        # Process each activity
+        for activity in activities:
             # Get available rooms for this time slot
             available_rooms = await self.get_available_rooms_for_slot(
                 db=db,
-                booking_date=request.booking_date,
+                booking_date=booking_date,
                 start_time=activity.start_time,
                 end_time=activity.end_time,
             )
             
             if not available_rooms:
                 warnings.append(
-                    f"No available rooms for '{activity.name}' on {request.booking_date} "
+                    f"No available rooms for '{activity.name}' on {booking_date} "
                     f"between {activity.start_time.strftime('%H:%M')}-{activity.end_time.strftime('%H:%M')}. "
                     f"All rooms are either booked or unavailable for this time slot."
                 )
@@ -247,7 +375,7 @@ Respond with JSON only."""
             ai_result = await self._get_ai_room_suggestion(
                 activity=activity,
                 available_rooms=available_rooms,
-                general_preferences=request.general_preferences,
+                general_preferences=general_preferences,
             )
             
             if not ai_result.get("suggested_room_id"):
@@ -289,7 +417,7 @@ Respond with JSON only."""
                 end_time=activity.end_time,
                 suggested_room=suggested_room,
                 alternative_rooms=alternative_rooms,
-                participants_count=activity.participants_count,
+                participants_count=activity.participants_count or 1,  # Show default
             )
             
             suggestions.append(activity_suggestion)
@@ -299,7 +427,7 @@ Respond with JSON only."""
             overall_notes = " | ".join(warnings)
         
         return EventSuggestionResponse(
-            booking_date=request.booking_date,
+            booking_date=booking_date,
             suggestions=suggestions,
             overall_notes=overall_notes,
         )

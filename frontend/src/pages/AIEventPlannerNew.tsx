@@ -187,19 +187,11 @@ const AIEventPlannerNew = () => {
   };
 
   const handleGetSuggestions = async () => {
-    if (!selectedDate) {
+    // Validate prompt is not empty
+    if (!aiPrompt || aiPrompt.trim() === "") {
       toast({
-        title: "Date Required",
-        description: "Please select a date for your event",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (activities.length === 0) {
-      toast({
-        title: "Activities Required",
-        description: "Please add at least one activity",
+        title: "Prompt Required",
+        description: "Please describe what you need to book",
         variant: "destructive",
       });
       return;
@@ -208,22 +200,56 @@ const AIEventPlannerNew = () => {
     setIsLoading(true);
 
     try {
-      const activitiesPayload: ActivityRequest[] = activities.map((activity) => ({
-        name: activity.activityType === "Custom" && activity.customName 
-          ? activity.customName 
-          : activity.activityType,
-        start_time: activity.startTime,
-        end_time: activity.endTime,
-        participants_count: activity.participantsCount > 0 ? activity.participantsCount : undefined,
-        required_amenities: activity.selectedAmenities.length > 0 ? activity.selectedAmenities : undefined,
-        preferences: activity.preferences || undefined,
-      }));
-
-      const response = await api.eventSuggestions.getSuggestions({
-        booking_date: selectedDate.toISOString().split("T")[0],
-        activities: activitiesPayload,
+      // Build request based on mode
+      let requestData: any = {
+        prompt: aiPrompt,
         general_preferences: generalPreferences || undefined,
-      });
+      };
+
+      // If explicit mode is enabled, include activities and date
+      if (isExplicitMode) {
+        if (!selectedDate) {
+          toast({
+            title: "Date Required",
+            description: "Please select a date when using detailed mode",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (activities.length === 0) {
+          toast({
+            title: "Activities Required",
+            description: "Please add at least one activity in detailed mode",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const activitiesPayload: ActivityRequest[] = activities.map((activity) => ({
+          name: activity.activityType === "Custom" && activity.customName 
+            ? activity.customName 
+            : activity.activityType,
+          start_time: activity.startTime,
+          end_time: activity.endTime,
+          participants_count: activity.participantsCount > 0 ? activity.participantsCount : undefined,
+          required_amenities: activity.selectedAmenities.length > 0 ? activity.selectedAmenities : undefined,
+          preferences: activity.preferences || undefined,
+        }));
+
+        requestData.booking_date = selectedDate.toISOString().split("T")[0];
+        requestData.activities = activitiesPayload;
+      } else {
+        // Prompt-only mode: optionally include date if selected
+        if (selectedDate) {
+          requestData.booking_date = selectedDate.toISOString().split("T")[0];
+        }
+        // Do NOT include activities - let AI parse from prompt
+      }
+
+      const response = await api.eventSuggestions.getSuggestions(requestData);
 
       setSuggestions(response);
       
@@ -488,15 +514,21 @@ const AIEventPlannerNew = () => {
                   id="ai-prompt"
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="Example: I need to plan a full day event on Friday. Morning team meeting from 9-11 AM for 15 people with a projector, followed by a workshop from 2-4 PM for 20 people needing whiteboards, and finally a client presentation from 5-6 PM for 10 people with video conferencing."
+                  placeholder="Example: I need a room for a meeting tomorrow at 10 AM for 2 hours with a projector and whiteboard for 8 people. Also, I want to book a workshop space on Friday afternoon from 2-5 PM for 15 people."
                   className="min-h-[180px] bg-slate-900/70 border-slate-600 text-white text-base resize-none focus:border-amber-400 focus:ring-amber-400"
                   rows={8}
                 />
                 <p className="text-slate-400 text-sm flex items-start gap-2">
                   <Lightbulb className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-400" />
                   <span>
-                    Tip: Include date, time slots, number of participants, and any special equipment needs. 
-                    The more details you provide, the better the suggestions!
+                    <strong>Default:</strong> AI will parse your text and assume 1 person if not specified. 
+                    Include dates, times, number of people, and equipment needs for best results. 
+                    {!isExplicitMode && (
+                      <span className="text-amber-400"> (Currently in simple mode - only your prompt will be used)</span>
+                    )}
+                    {isExplicitMode && (
+                      <span className="text-green-400"> (Detailed mode active - activities below will also be sent)</span>
+                    )}
                   </span>
                 </p>
               </div>
@@ -526,7 +558,9 @@ const AIEventPlannerNew = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Settings className="h-5 w-5 text-amber-400" />
-                      <CardTitle className="text-amber-400">Be More Explicit</CardTitle>
+                      <CardTitle className="text-amber-400">
+                        {isExplicitMode ? "✓ Using Detailed Mode" : "Use Detailed Activity Settings"}
+                      </CardTitle>
                     </div>
                     {isExplicitMode ? (
                       <ChevronUp className="h-5 w-5 text-slate-400" />
@@ -536,8 +570,8 @@ const AIEventPlannerNew = () => {
                   </div>
                   <CardDescription className="text-slate-400">
                     {isExplicitMode 
-                      ? "Configure detailed settings for each activity" 
-                      : "Click to manually configure date, activities, and detailed requirements"
+                      ? "Activities and date will be sent explicitly along with your prompt" 
+                      : "Click to manually specify date, time slots, participants, and amenities (optional)"
                     }
                   </CardDescription>
                 </CardHeader>
