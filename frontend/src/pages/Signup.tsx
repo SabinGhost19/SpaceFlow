@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BeerMugIcon } from '@/components/BeerMugIcon';
+import { Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import AvatarPicker from "@/components/AvatarPicker";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -16,6 +19,8 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isManager, setIsManager] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,6 +56,7 @@ const Signup = () => {
         password,
         full_name: name,
         is_manager: isManager,
+        avatar_url: avatarUrl || undefined,
       });
       toast({
         title: "Account created",
@@ -63,6 +69,14 @@ const Signup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAvatarSelect = (selectedAvatarUrl: string) => {
+    setAvatarUrl(selectedAvatarUrl);
+    toast({
+      title: "Avatar Selected",
+      description: "Your avatar has been set!",
+    });
   };
 
   return (
@@ -81,6 +95,37 @@ const Signup = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Avatar Selection */}
+            <div className="space-y-2">
+              <Label className="text-slate-100 font-medium">Profile Avatar (Optional)</Label>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Avatar className="h-20 w-20">
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} alt="Selected avatar" />
+                    ) : (
+                      <AvatarFallback className="bg-amber-500 text-slate-900 text-xl font-bold">
+                        {username ? username.substring(0, 2).toUpperCase() : "??"}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <Button
+                    type="button"
+                    size="icon"
+                    onClick={() => setShowAvatarPicker(true)}
+                    className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-slate-300">
+                    {avatarUrl ? "Avatar selected! You can change it anytime." : "Click the camera icon to choose an animated avatar"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name" className="text-slate-100 font-medium">Full Name</Label>
               <Input
@@ -169,6 +214,14 @@ const Signup = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Avatar Picker Dialog */}
+      <AvatarPicker
+        open={showAvatarPicker}
+        onOpenChange={setShowAvatarPicker}
+        onSelect={handleAvatarSelect}
+        currentAvatar={avatarUrl}
+      />
     </div>
   );
 };

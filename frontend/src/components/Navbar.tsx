@@ -169,6 +169,7 @@ export const Navbar = () => {
             )}
 
             {isAuthenticated && user && (
+
               <>
                 {/* Notification Bell */}
                 <NotificationBell />
@@ -203,6 +204,7 @@ export const Navbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
+
             )}
           </div>
         </div>

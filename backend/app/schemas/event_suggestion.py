@@ -18,8 +18,9 @@ class ActivityRequest(BaseModel):
 
 class EventSuggestionRequest(BaseModel):
     """Schema for requesting AI-powered event suggestions."""
-    booking_date: date = Field(..., description="Date for the activities")
-    activities: List[ActivityRequest] = Field(..., min_length=1, description="List of activities to schedule")
+    prompt: str = Field(..., description="Natural language description of the event needs")
+    booking_date: Optional[date] = Field(None, description="Date for the activities (extracted from prompt if not provided)")
+    activities: Optional[List[ActivityRequest]] = Field(None, description="Optional explicit list of activities (only when user enables detailed mode)")
     general_preferences: Optional[str] = Field(None, description="General preferences for all activities")
 
 
