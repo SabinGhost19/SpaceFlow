@@ -19,7 +19,7 @@ from app.crud import room as crud_room
 router = APIRouter()
 
 
-@router.get("/my-bookings", response_model=List[Booking])
+@router.get("/my-bookings", response_model=List[BookingWithDetails])
 async def get_my_bookings(
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
@@ -43,7 +43,34 @@ async def get_my_bookings(
         end_date=end_date,
         status=status
     )
-    return bookings
+    
+    # Convert to BookingWithDetails format
+    bookings_with_details = []
+    for booking in bookings:
+        # Fetch room name
+        room = await crud_room.get_room(db, booking.room_id)
+        
+        booking_dict = {
+            "id": booking.id,
+            "room_id": booking.room_id,
+            "user_id": booking.user_id,
+            "booking_date": booking.booking_date,
+            "start_time": booking.start_time,
+            "end_time": booking.end_time,
+            "status": booking.status,
+            "approval_status": booking.approval_status,
+            "approved_by_id": booking.approved_by_id,
+            "approved_at": booking.approved_at,
+            "rejection_reason": booking.rejection_reason,
+            "created_at": booking.created_at,
+            "updated_at": booking.updated_at,
+            "room_name": room.name if room else None,
+            "organizer_name": booking.user.full_name if hasattr(booking, 'user') and booking.user else None,
+            "participant_ids": [p.id for p in booking.participants] if hasattr(booking, 'participants') and booking.participants else []
+        }
+        bookings_with_details.append(booking_dict)
+    
+    return bookings_with_details
 
 
 @router.get("/my-schedule", response_model=UserSchedule)
