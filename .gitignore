@@ -41,7 +41,6 @@ venv.bak/
 htmlcov/
 *.cover
 .hypothesis/
-*.md
 # Logs
 *.log
 logs/
